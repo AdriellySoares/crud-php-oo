@@ -22,7 +22,6 @@ $rotas = [
     '/alunos/excluir' => criarRota(AlunoController::class, 'excluir'),
     '/alunos/relatorio' => criarRota(AlunoController::class, 'relatorio'),
 
-
     '/cursos/listar' => criarRota(CursoController::class, 'listar'),
     '/cursos/novo' => criarRota(CursoController::class, 'cadastrar'),
     '/cursos/editar' => criarRota(CursoController::class, 'editar'),
