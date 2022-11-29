@@ -14,6 +14,13 @@ class CursoRepository implements RepositoryInterface
 
     public const TABLE = "tb_cursos";
 
+    public PDO $pdo;
+
+    public function __construct()
+    {
+        $this->pdo = DatabaseConnection::abrirConexao();
+    }
+
     public function buscarTodos(): iterable
     {
         $conexao = DatabaseConnection::abrirConexao();
@@ -42,6 +49,18 @@ class CursoRepository implements RepositoryInterface
 
     public function inserir(object $dados): object
     {
+        $sql = "INSERT INTO " . self::TABLE . 
+            "(nome, descricao, cargaHoraria, status, categoria_id) " . 
+            "VALUES (
+                '{$dados->nome}', 
+                '{$dados->descricao}', 
+                '{$dados->cargaHoraria}',  
+                '1', 
+                '{$dados->categoria_id}'
+            );";
+
+        $this->pdo->query($sql);
+        
         return $dados;
     } 
 
