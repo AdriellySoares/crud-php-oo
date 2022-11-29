@@ -17,6 +17,11 @@ class AuthController extends AbstractController
 
     public function login(): void
     {
+        if (false === empty($_POST)) {
+            var_dump($_POST);
+            return;
+        }
+
         // $this->render('auth/login', [], false);
         $this->render('auth/login', navbar: false); // apenas a partir do PHP8
     }

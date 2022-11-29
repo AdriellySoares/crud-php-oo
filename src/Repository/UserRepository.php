@@ -18,6 +18,16 @@ class UserRepository
         $this->pdo = DatabaseConnection::abrirConexao();
     }
 
+    public function findOneByEmail(string $email): User
+    {
+        $sql = "SELECT * FROM ".self::TABLE." WHERE email='($email)";
+        
+        $query = $this->pdo->query($sql);
+        $query->execute();
+
+        return $query->fetchObject(User::class);
+    }
+
     public function findAll(): iterable
     {
         $sql = 'SELECT * FROM '.self::TABLE;
