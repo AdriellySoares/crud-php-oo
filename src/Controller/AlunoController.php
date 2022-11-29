@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Model\Aluno;
 use App\Repository\AlunoRepository;
+use App\Security\UserSecurity;
 use Dompdf\Dompdf;
 use Exception;
 
@@ -20,6 +21,8 @@ class AlunoController extends AbstractController
 
     public function listar(): void
     {
+        $this->checkLogin();
+
         $alunos = $this->repository->buscarTodos();
 
         $this->render('aluno/listar', [
@@ -60,6 +63,7 @@ class AlunoController extends AbstractController
 
     public function editar(): void
     {
+        $this->checkLogin();
         $id = $_GET['id'];
         $rep = new AlunoRepository();
         $aluno = $rep->buscarUm($id);
@@ -135,14 +139,14 @@ class AlunoController extends AbstractController
             </table>
         ";
 
-        $dompdf = new Dompdf();
-        $dompdf->setPaper('A4', 'portrait'); // tamanho da pagina
+        // $dompdf = new Dompdf();
+        // $dompdf->setPaper('A4', 'portrait'); // tamanho da pagina
 
-        $dompdf->loadHtml($design); //carrega o conteudo do PDF
+        // $dompdf->loadHtml($design); //carrega o conteudo do PDF
 
-        $dompdf->render(); //aqui renderiza 
-        $dompdf->stream('relatorio-alunos.pdf', [
-            'Attachment' => 0,
-        ]); //é aqui que a magica acontece
+        // $dompdf->render(); //aqui renderiza 
+        // $dompdf->stream('relatorio-alunos.pdf', [
+        //     'Attachment' => 0,
+        // ]); //é aqui que a magica acontece
     }
 }

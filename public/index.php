@@ -1,10 +1,9 @@
 <?php
 
 //solicitando ao composer que gerencie o carregamento automagico dos arquivos
-
-use App\Connection\DatabaseConnection;
-
 include_once '../vendor/autoload.php';
+
+session_start();
 
 include '../config/database.php';
 

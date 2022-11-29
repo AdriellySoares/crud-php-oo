@@ -9,6 +9,7 @@ class CursoController extends AbstractController
 {
     public function listar(): void
     {
+        $this->checkLogin();
         $rep = new CursoRepository();
         $cursos = $rep->buscarTodos();
 
@@ -19,8 +20,8 @@ class CursoController extends AbstractController
 
     public function cadastrar(): void
     {
-        $rep = new CategoriaRepository();
-        $categorias = $rep->buscarTodos();
+        // $rep = new CategoriaRepository();
+        // $categorias = $rep->buscarTodos();
         echo "Pagina de cadastrar";
     }
 

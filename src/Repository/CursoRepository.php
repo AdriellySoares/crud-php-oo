@@ -18,13 +18,21 @@ class CursoRepository implements RepositoryInterface
     {
         $conexao = DatabaseConnection::abrirConexao();
 
-        $sql = "SELECT * FROM ".self::TABLE." INNER JOIN tb_categorias ON tb_cursos.categoria_id = tb_categorias.id";
+        $sql = "SELECT 
+                    tb_cursos.id as curso_id,
+                    tb_cursos.nome as curso_nome,
+                    tb_cursos.descricao as curso_descricao,
+                    tb_cursos.cargaHoraria as curso_carga_horaria,
+                    tb_cursos.status as curso_status,
+                    tb_categorias.id as categoria_id,
+                    tb_categorias.nome as categoria_nome 
+                    FROM ".self::TABLE." INNER JOIN tb_categorias ON tb_cursos.categoria_id = tb_categorias.id";
 
         $query = $conexao->query($sql);
 
         $query->execute();
 
-        return $query->fetchAll(PDO::FETCH_CLASS, Curso::class && Categoria::class);
+        return $query->fetchAll();
     }
 
     public function buscarUm(string $id): ?object

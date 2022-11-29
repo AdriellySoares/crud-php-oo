@@ -1,4 +1,4 @@
-<?php var_dump($cursos);?>
+<?php print_r($cursos);?>
 <section class="mt-3 card card-body">
     <h1>Gerenciar Cursos</h1>
 
@@ -21,12 +21,12 @@
                     foreach ($cursos as $curso) {
                         echo "
                             <tr>
-                                <td>{$curso['id']}</td>
-                                <td>{$curso[1]}</td>
-                                <td>{$curso[7]}</td>
+                                <td>{$curso['curso_id']}</td>
+                                <td>{$curso['curso_nome']}</td>
+                                <td>{$curso['categoria_nome']}</td>
                                 <td>
-                                    <a href='/cursos/editar?id={$curso['id']}' class='btn btn-warning'>Editar</a>
-                                    <a href='/cursos/excluir?id={$curso['id']}' class='btn btn-danger'>Deletar</a>
+                                    <a href='/cursos/editar?id={$curso['curso_id']}' class='btn btn-warning'>Editar</a>
+                                    <a href='/cursos/excluir?id={$curso['curso_id']}' class='btn btn-danger'>Deletar</a>
                                 </td>
                             </tr>
                         ";

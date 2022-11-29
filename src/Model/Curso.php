@@ -11,4 +11,5 @@ class Curso
     public string $descricao;
     public bool $status;
     public int $categoria_id;
+    // public Categoria $categoria;
 }

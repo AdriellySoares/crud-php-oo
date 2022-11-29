@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repository\UserRepository;
+use App\Security\UserSecurity;
 
 class AuthController extends AbstractController
 {
@@ -18,7 +19,23 @@ class AuthController extends AbstractController
     public function login(): void
     {
         if (false === empty($_POST)) {
-            var_dump($_POST);
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+
+            $user = $this->userRepository->findOneByEmail($email);
+
+            if (false === $user) {
+                die('Email não existe');
+            }
+
+            if (false === password_verify($password, $user->password)) {
+                die('Senha incorreta');
+            }
+
+            UserSecurity::connect($user);
+
+            $this->redirect('/alunos/listar');
+
             return;
         }
 
@@ -28,6 +45,8 @@ class AuthController extends AbstractController
 
     public function logout(): void
     {
+        UserSecurity::disconnect();
 
+        $this->redirect('/login');
     }
 }
