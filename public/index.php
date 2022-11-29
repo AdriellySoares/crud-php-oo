@@ -1,19 +1,19 @@
 <?php
 
-//solicitando ao composer que gerencie o carregamento automagico dos arquivos
-include_once '../vendor/autoload.php';
+use App\Connection\DatabaseConnection;
+
+include dirname(__DIR__) . '../vendor/autoload.php';
+include dirname(__DIR__) . '../config/database.php';
 
 session_start();
 
-include '../config/database.php';
+$rotas = require dirname(__DIR__) . '../config/rotas.php';
 
-$rotas = require '../config/routes.php';
+$url = $_SERVER["REQUEST_URI"];
+$rota = explode("?", $url)[0];
 
-$url = $_SERVER['REQUEST_URI']; //pegando a url acessada pelo usuario
-$rota = explode('?', $url)[0]; //separando a url, atraves do "?"
-
-if (false === isset($rotas[$rota])) {
-    echo "Erro 404";
+if(!isset($rotas[$rota])){
+    echo 'Erro 404';
     exit;
 }
 

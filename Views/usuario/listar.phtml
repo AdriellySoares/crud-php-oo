@@ -1,0 +1,40 @@
+<section class="card card-body container-fluid">
+    <h1 class="text-center">Listar usuarios:</h1>
+    <hr>
+    <div class="mt-2 w-100 d-flex justify-content-end">
+        <a href="/usuarios/novo"class="btn btn-outline-primary me-1">Adicionar usuario</a>
+        <a href="/alunos/relatorio" target="_blank" class="btn btn-outline-primary">Gerar PDF</a>
+    </div>
+    
+    <table class="table table-striped table-hover table-bordered align-middle text-center mt-4">
+    <caption>Tabela de alunos</caption>
+        <thead class="table-dark">
+            <tr>
+                <th>#ID</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Perfil</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+                foreach($usuarios ?? [] as $cadaUsuario)
+                {
+                    echo "
+                        <tr>
+                            <td class='fw-bold'>{$cadaUsuario->id}</td>
+                            <td>{$cadaUsuario->nome}</td>
+                            <td>{$cadaUsuario->email}</td>
+                            <td>{$cadaUsuario->perfil}</td>
+                            <td>
+                                <a href='/alunos/editar?id={$cadaUsuario->id}' class='btn btn-warning'>Editar</a>
+                                <a href='/alunos/excluir?id={$cadaUsuario->id}' class='btn btn-danger'>Excluir</a>
+                            </td>
+                        </tr>
+                    ";
+                }
+            ?>
+        </tbody>
+    </table>
+</section>  

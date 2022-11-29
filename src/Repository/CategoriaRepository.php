@@ -1,6 +1,6 @@
-<?php
+<?php 
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Repository;
 
@@ -10,42 +10,54 @@ use PDO;
 
 class CategoriaRepository implements RepositoryInterface
 {
+    public const TABLE = 'tb_categorias';
 
-    public const TABLE = "tb_categorias";
+    private PDO $conexao;
 
-    public function buscarTodos(): iterable
+    public function __construct()
     {
-        $conexao = DatabaseConnection::abrirConexao();
+        $this->conexao = DatabaseConnection::abrirConexao();
+    }
 
-        $sql = "SELECT * FROM ".self::TABLE;
-
-        $query = $conexao->query($sql);
-
+    public function buscarTodos() : iterable
+    {
+        $sql = "SELECT * FROM " . self::TABLE;
+        $query = $this->conexao->query($sql);
         $query->execute();
-
         return $query->fetchAll(PDO::FETCH_CLASS, Categoria::class);
     }
 
-    public function buscarUm(string $id): ?object
+    public function buscarUm(string $id) : object
     {
-        return new \stdClass();
+        $sql = "SELECT * FROM " . self::TABLE . " WHERE id=" . $id;
+        $query = $this->conexao->query($sql);
+        $query->execute();
+    
+        return $query->fetchObject(Categoria::class);       
     }
 
     public function inserir(object $dados): object
     {
-        return $dados;
-    } 
-
-    public function atualizar(object $dados, string $id): object
-    {
+        $sql = "INSERT INTO " . self::TABLE . "(nome, email, senha, perfil) VALUES ('{$dados->nome}', '{$dados->email}', '{$dados->senha}', '{$dados->perfil}')";
+        $this->conexao->query($sql);
         return $dados;
     }
 
-    public function excluir(string $id): void
+    public function atualizar(object $novosDados, string $id): object
     {
-        $conexao = DatabaseConnection::abrirConexao();
-        $sql = "DELETE FROM ".self::TABLE." WHERE id = '{$id}'";
-        $query = $conexao->query($sql);
+        $sql = "UPDATE " . self::TABLE . 
+        " SET nome='{$novosDados->nome}' WHERE id = '{$id}';
+        ";
+
+        $this->conexao->query($sql);
+
+        return $novosDados;
+    }
+
+    public function excluir(string $id) : void
+    {
+        $sql = "DELETE FROM " . self::TABLE . " WHERE id=" . $id;
+        $query = $this->conexao->query($sql);
         $query->execute();
     }
 }

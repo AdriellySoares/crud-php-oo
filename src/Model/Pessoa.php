@@ -1,10 +1,10 @@
-<?php
+<?php 
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Model;
 
-abstract class Pessoa
+abstract class Pessoa 
 {
     public string $nome;
     public string $cpf;

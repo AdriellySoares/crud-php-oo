@@ -1,0 +1,38 @@
+<section class="card card-body container-fluid">
+    <h1 class="text-center">Listar categorias:</h1>
+    <hr>
+    <div class="mt-2 w-100 d-flex justify-content-end ">
+        <a href="/categorias/novo" class="btn btn-outline-primary me-1">Adicionar categorias</a>
+        <a href="/categorias/relatorio" class="btn btn-outline-primary">Gerar PDF</a>
+    </div>
+    <div>
+        <table class="table table-striped table-hover table-bordered align-middle text-center mt-4">
+            <caption>Tabela de categorias</caption>
+            <thead class="table-dark">
+                <tr>
+                    <th>#ID</th>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                foreach ($categorias ?? [] as $cadaCategoria)
+                {
+                    echo "
+                        <tr>
+                            <td class='fw-bold'>{$cadaCategoria->id}</td>
+                            <td>{$cadaCategoria->nome}</td>
+                            <td>
+                                <a href='/categorias/editar?id={$cadaCategoria->id}' class='btn btn-warning'>Editar</a>
+                                <a href='/categorias/excluir?id={$cadaCategoria->id}' class='btn btn-danger'>Excluir</a>
+                            </td>
+                        </tr>
+                    ";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    </div>
+</section>

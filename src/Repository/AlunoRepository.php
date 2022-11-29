@@ -1,6 +1,6 @@
-<?php
+<?php 
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Repository;
 
@@ -10,77 +10,62 @@ use PDO;
 
 class AlunoRepository implements RepositoryInterface
 {
-    public const TABLE = 'tb_alunos';
 
-    public PDO $pdo;
+    public const TABLE = 'tb_alunos';
+    public PDO $conexao;
 
     public function __construct()
     {
-        $this->pdo = DatabaseConnection::abrirConexao();
+        $this->conexao = DatabaseConnection::abrirConexao();
     }
 
     public function buscarTodos(): iterable
     {
         $sql = 'SELECT * FROM ' . self::TABLE;
 
-        //preparando para executar no banco
-        $query = $this->pdo->query($sql);
+        $query = $this->conexao->query($sql);
+        $query->execute();
 
-        //executando o comando lá no banco de dados
-        $query->execute(); 
-
-        return $query->fetchAll(PDO::FETCH_CLASS, Aluno::class); //pegando os dados e tranformando em array
+        return $query->fetchAll(PDO::FETCH_CLASS, Aluno::class);
     }
-
+    
     public function buscarUm(string $id): object
     {
-        $sql = "SELECT * FROM ".self::TABLE." WHERE id = '{$id}'";
-        $query = $this->pdo->query($sql);
+        $sql = "SELECT * FROM " . self::TABLE . " WHERE id=" . $id;
+        $query = $this->conexao->query($sql);
         $query->execute();
-        return $query->fetchObject(Aluno::class); 
+
+        return $query->fetchObject(Aluno::class);       
     }
 
     public function inserir(object $dados): object
     {
-        $matricula = date('Ymds') . substr($dados->cpf, -2);
-
+        $matricula = date('Ymd') . substr($dados->cpf, -2);
         $sql = "INSERT INTO " . self::TABLE . 
-            "(nome, email, cpf, matricula, status, dataNascimento, genero) " . 
-            "VALUES (
-                '{$dados->nome}', 
-                '{$dados->email}', 
-                '{$dados->cpf}', 
-                '{$matricula}', 
-                '1', 
-                '{$dados->dataNascimento}', 
-                '{$dados->genero}'
-            );";
+        "(nome, cpf, matricula, email, status, genero, dataNascimento) " . 
+        "VALUES ('{$dados->nome}', '{$dados->cpf}', '{$matricula}', '{$dados->email}', '1', '{$dados->genero}', '{$dados->dataNascimento}');";
 
-        $this->pdo->query($sql);
+        $this->conexao->query($sql);
 
         return $dados;
-    } 
+    }
 
     public function atualizar(object $novosDados, string $id): object
     {
         $sql = "UPDATE " . self::TABLE . 
-            " SET 
-                nome='{$novosDados->nome}',
-                email='{$novosDados->email}',
-                cpf='{$novosDados->cpf}',
-                dataNascimento='{$novosDados->dataNascimento}',
-                genero='{$novosDados->genero}' 
-            WHERE id = '{$id}';";
+        " SET nome='{$novosDados->nome}', cpf='{$novosDados->cpf}', email='{$novosDados->email}', genero='{$novosDados->genero}', dataNascimento='{$novosDados->dataNascimento}'
+        WHERE id = '{$id}';
+        ";
 
-        $this->pdo->query($sql);
+        $this->conexao->query($sql);
 
         return $novosDados;
     }
 
-    public function excluir(string $id): void
+    public function excluir(string $id) : void
     {
-        $sql = "DELETE FROM ".self::TABLE." WHERE id = '{$id}'";
-        $query = $this->pdo->query($sql);
+        $sql = "DELETE FROM " . self::TABLE . " WHERE id=" . $id;
+        $query = $this->conexao->query($sql);
         $query->execute();
     }
 }

@@ -1,24 +1,16 @@
-<?php
+<?php 
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Model;
 
-use DateTime; //importando a classe interna do PHP DateTime
-
-//aqui vai ficar a definição do caminho até essa classe
+//Aqui vai ficar a definição do caminho até essa classe
 
 class Aluno extends Pessoa
 {
-    public int $matricula;
-    public string $dataNascimento;
+    public string $matricula;
+    public string $email;
     public bool $status;
-    public string $genero; //enum
-
-    // public function __construct(string $nome = '', string $dataNascimento = '')
-    // {
-    //     $this->nome = ucwords(strtolower($nome));
-    //     $this->dataNascimento = $dataNascimento;
-    // }
+    public string $genero;
+    public string $dataNascimento;
 }
-

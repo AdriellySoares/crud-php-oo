@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Controller;
 
@@ -8,33 +8,30 @@ use App\Repository\ProfessorRepository;
 
 class ProfessorController extends AbstractController
 {
-    // public const REPOSITORY = new ProfessorRepository();
-
-    public function listar(): void
+    public function listar() : void
     {
-        $rep = new ProfessorRepository();
-        $professores = $rep->buscarTodos();
-
-        $this->render("professor/listar", [
-            'professores' => $professores,
+        $rep = new ProfessorRepository;
+        $this->renderizar('professor/listar', [
+            'professores' => $rep->buscarTodos()
         ]);
     }
 
-    public function cadastrar(): void
+    public function novo() : void
     {
-        echo "Pagina de cadastrar";
+        $this->renderizar('professor/novo');
     }
 
-    public function excluir(): void
+    public function editar() : void
+    {
+        $this->renderizar('professor/editar');
+    }
+
+    public function excluir() : void
     {
         $id = $_GET['id'];
         $rep = new ProfessorRepository();
         $rep->excluir($id);
-        $this->redirect("/professores/listar");
-    }
-
-    public function editar(): void
-    {
         
+        $this->redirecionar('professores/listar');
     }
-}
+} 

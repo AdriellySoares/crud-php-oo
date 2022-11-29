@@ -1,52 +1,50 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Controller;
 
-use App\Repository\UserRepository;
-use App\Security\UserSecurity;
+use App\Repository\UsuarioRepository;
+use App\Security\UsuarioSecurity;
 
 class AuthController extends AbstractController
 {
-    private UserRepository $userRepository;
-
+    private UsuarioRepository $usuarioRepository;
     public function __construct()
     {
-        $this->userRepository = new UserRepository();
+        $this->usuarioRepository = new UsuarioRepository;
     }
 
-    public function login(): void
+    public function login() : void
     {
-        if (false === empty($_POST)) {
+        if(false === empty($_POST)){
             $email = $_POST['email'];
-            $password = $_POST['password'];
+            $senha = $_POST['senha'];
 
-            $user = $this->userRepository->findOneByEmail($email);
-
-            if (false === $user) {
+            $usuario = $this->usuarioRepository->buscarUmPeloEmail($email);
+            
+            if(!$usuario){
                 die('Email não existe');
             }
 
-            if (false === password_verify($password, $user->password)) {
-                die('Senha incorreta');
+            if(!password_verify($senha, $usuario->senha)){
+                die('Senha invalida');
             }
-
-            UserSecurity::connect($user);
-
-            $this->redirect('/alunos/listar');
-
+            
+            UsuarioSecurity::seConectar($usuario);
+            $this->redirecionar("");
             return;
+
         }
 
-        // $this->render('auth/login', [], false);
-        $this->render('auth/login', navbar: false); // apenas a partir do PHP8
+
+        $this->renderizar('auth/login', [], false);
+        // $this->render('auth/login', navbar: false); APENAS A PARTIR DO PHP8
     }
 
-    public function logout(): void
+    public function logout() : void
     {
-        UserSecurity::disconnect();
-
-        $this->redirect('/login');
+        UsuarioSecurity::desconectar();
+        $this->redirecionar('login');
     }
 }
