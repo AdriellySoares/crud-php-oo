@@ -1,25 +1,29 @@
 <?php
-
-declare(strict_types = 1);
-
+declare(strict_types=1);
 namespace App\Controller;
+
+use App\Security\UsuarioSecurity;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 abstract class AbstractController
 {
-    public function renderizar(string $nomeDoArquivo, ?array $dados = null, bool $navbar = true) : void
+    public function render(string $view, ?array $dados = [], bool $navbar = true): void
     {
-        if(isset($dados)){
-            extract($dados);
-        }
-        include_once dirname(__DIR__) . "../../views/template/head.phtml";
-        $navbar === true && include_once dirname(__DIR__) . "../../views/template/navbar.phtml";
-        include_once dirname(__DIR__) . "../../views/{$nomeDoArquivo}.phtml";
-        include_once dirname(__DIR__) . "../../views/template/foot.phtml";
+        extract($dados);
+        include_once '../views/template/header.phtml';
+        $navbar === true && include_once '../views/template/menu.phtml';
+        include_once "../views/{$view}.phtml";
+        include_once '../views/template/footer.phtml';
     }
-
-    public function redirecionar(string $onde) : void
+    public function redirect(string $local): void
     {
-        header("Location:/{$onde}");
-        exit();
+        header('location: '.$local);
     }
+    // public function checarLogin()
+    // {
+    //     if(UsuarioSecurity::estaLogado()===false){
+    //         $this->redirect('/login');
+    //     }
+    // }
 }

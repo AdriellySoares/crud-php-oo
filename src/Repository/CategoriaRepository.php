@@ -1,7 +1,5 @@
-<?php 
-
-declare(strict_types = 1);
-
+<?php
+declare(strict_types=1);
 namespace App\Repository;
 
 use App\Connection\DatabaseConnection;
@@ -11,53 +9,42 @@ use PDO;
 class CategoriaRepository implements RepositoryInterface
 {
     public const TABLE = 'tb_categorias';
-
-    private PDO $conexao;
-
+    public PDO $pdo;
     public function __construct()
     {
-        $this->conexao = DatabaseConnection::abrirConexao();
+        $this->pdo = DatabaseConnection::abrirConexao();
     }
-
-    public function buscarTodos() : iterable
+    public function buscarTodos(): iterable
     {
-        $sql = "SELECT * FROM " . self::TABLE;
-        $query = $this->conexao->query($sql);
+        $sql = 'SELECT * FROM '.self::TABLE;
+        $query = $this->pdo->query($sql);
         $query->execute();
         return $query->fetchAll(PDO::FETCH_CLASS, Categoria::class);
     }
-
-    public function buscarUm(string $id) : object
+    public function buscarUm(string $id): object
     {
-        $sql = "SELECT * FROM " . self::TABLE . " WHERE id=" . $id;
-        $query = $this->conexao->query($sql);
+        $sql = "SELECT * FROM ".self::TABLE." WHERE id ='{$id}'";
+        $query = $this->pdo->query($sql);
         $query->execute();
-    
-        return $query->fetchObject(Categoria::class);       
+        return $query->fetchObject(Categoria::class);
     }
-
     public function inserir(object $dados): object
     {
-        $sql = "INSERT INTO " . self::TABLE . "(nome, email, senha, perfil) VALUES ('{$dados->nome}', '{$dados->email}', '{$dados->senha}', '{$dados->perfil}')";
-        $this->conexao->query($sql);
+        $sql = "INSERT INTO ".self::TABLE."(nome) "."VALUES ('{$dados->nome}');";
+        $this->pdo->query($sql);
         return $dados;
     }
-
     public function atualizar(object $novosDados, string $id): object
     {
-        $sql = "UPDATE " . self::TABLE . 
-        " SET nome='{$novosDados->nome}' WHERE id = '{$id}';
-        ";
-
-        $this->conexao->query($sql);
-
+        $sql = "UPDATE ".self::TABLE." SET
+            nome='{$novosDados->nome}' WHERE id = '{$id}';";
+        $this->pdo->query($sql);
         return $novosDados;
     }
-
-    public function excluir(string $id) : void
+    public function excluir(string $id): void
     {
-        $sql = "DELETE FROM " . self::TABLE . " WHERE id=" . $id;
-        $query = $this->conexao->query($sql);
+        $sql = "DELETE FROM ".self::TABLE." WHERE id = '{$id}'";
+        $query = $this->pdo->query($sql);
         $query->execute();
     }
 }

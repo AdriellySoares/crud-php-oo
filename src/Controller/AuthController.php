@@ -1,7 +1,5 @@
 <?php
-
-declare(strict_types = 1);
-
+declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repository\UsuarioRepository;
@@ -12,39 +10,28 @@ class AuthController extends AbstractController
     private UsuarioRepository $usuarioRepository;
     public function __construct()
     {
-        $this->usuarioRepository = new UsuarioRepository;
+        $this->usuarioRepository = new UsuarioRepository();
     }
-
-    public function login() : void
+    public function login(): void
     {
         if(false === empty($_POST)){
             $email = $_POST['email'];
             $senha = $_POST['senha'];
-
-            $usuario = $this->usuarioRepository->buscarUmPeloEmail($email);
-            
-            if(!$usuario){
+            $usuario = $this->usuarioRepository->buscarUmPorEmail($email);
+            if(false === $usuario){
                 die('Email não existe');
             }
-
-            if(!password_verify($senha, $usuario->senha)){
-                die('Senha invalida');
+            if(false === password_verify($senha, $usuario->senha)){
+                die('Senha incorreta');
             }
-            
-            UsuarioSecurity::seConectar($usuario);
-            $this->redirecionar("");
+            UsuarioSecurity::conectar($usuario);
             return;
-
         }
-
-
-        $this->renderizar('auth/login', [], false);
-        // $this->render('auth/login', navbar: false); APENAS A PARTIR DO PHP8
+        $this->render('auth/login', navbar: false);
     }
-
-    public function logout() : void
+    public function logout(): void
     {
         UsuarioSecurity::desconectar();
-        $this->redirecionar('login');
+        $this->redirect('/login');
     }
 }

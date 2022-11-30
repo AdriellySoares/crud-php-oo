@@ -1,13 +1,11 @@
 <?php
-
-declare(strict_types = 1);
-
+declare(strict_types=1);
 namespace App\Controller;
-
 use App\Model\Aluno;
 use App\Repository\AlunoRepository;
 use App\Security\UsuarioSecurity;
 use Dompdf\Dompdf;
+use Dompdf\Options;
 use Exception;
 
 class AlunoController extends AbstractController
@@ -15,137 +13,126 @@ class AlunoController extends AbstractController
     private AlunoRepository $repository;
     public function __construct()
     {
-        $this->repository = new AlunoRepository;
+        $this->repository = new AlunoRepository();
     }
-
-    public function listar() : void
+    public function listar(): void
     {
-        if(!UsuarioSecurity::estaLogado()){
-            die('Precisa estar logado');
-        }
-        $this->renderizar('aluno/listar', [
-            'alunos' => $this->repository->buscarTodos()
+        // $this->checarLogin();
+        $alunos = $this->repository->buscarTodos();
+        $this->render('aluno/listar', [
+            'alunos'=>$alunos,
         ]);
     }
-
-    public function novo() : void
+    public function cadastrar(): void
     {
-        if(empty($_POST)){
-            $this->renderizar('aluno/novo');
+        // $this->checarLogin();
+        if(true === empty($_POST)){
+            $this->render('aluno/cadastrar');
             return;
         }
-
         $aluno = new Aluno();
         $aluno->nome = $_POST['nome'];
+        $aluno->dataNascimento = $_POST['nascimento'];
         $aluno->cpf = $_POST['cpf'];
         $aluno->email = $_POST['email'];
         $aluno->genero = $_POST['genero'];
-        $aluno->dataNascimento = $_POST['dataNascimento'];
-        
         try{
             $this->repository->inserir($aluno);
         } catch(Exception $exception){
-            if(str_contains($exception->getMessage(), 'cpf')){
+            if(true === str_contains($exception->getMessage(), 'cpf')){
                 die('CPF já existe');
             }
-            if(str_contains($exception->getMessage(), 'email')){
+            if(true === str_contains($exception->getMessage(), 'email')){
                 die('Email já existe');
             }
-
             die('Vish, aconteceu um erro');
         }
-        $this->redirecionar('alunos/listar');      
+        $this->redirect('/alunos/listar');
     }
-
-    public function editar() : void
+    public function editar(): void
     {
+        // $this->checarLogin();
         $id = $_GET['id'];
         $aluno = $this->repository->buscarUm($id);
-        $this->renderizar('aluno/editar', [$aluno]);
-        if(!empty($_POST)){
+        $this->render('aluno/editar', [$aluno]);
+        if (false === empty($_POST)) {
             $aluno->nome = $_POST['nome'];
+            $aluno->dataNascimento = $_POST['nascimento'];
             $aluno->cpf = $_POST['cpf'];
             $aluno->email = $_POST['email'];
             $aluno->genero = $_POST['genero'];
-            $aluno->dataNascimento = $_POST['dataNascimento'];
-            try{
+            try {
                 $this->repository->atualizar($aluno, $id);
-            } catch(Exception $exception){
-                if(str_contains($exception->getMessage(), 'cpf')){
+            } catch (Exception $exception) {
+                if (true === str_contains($exception->getMessage(), 'cpf')) {
                     die('CPF já existe');
                 }
-                if(str_contains($exception->getMessage(), 'email')){
+                if (true === str_contains($exception->getMessage(), 'email')) {
                     die('Email já existe');
                 }
-    
                 die('Vish, aconteceu um erro');
             }
-            $this->redirecionar('alunos/listar');
+            $this->redirect('/alunos/listar');
         }
     }
-
-    public function excluir() : void
+    public function excluir(): void
     {
+        // $this->checarLogin();
         $id = $_GET['id'];
         $this->repository->excluir($id);
-        
-        $this->redirecionar('alunos/listar');
+        $this->render('aluno/excluir');
+        $this->redirect('/alunos/listar');
     }
-    
-    public function relatorio() : void
+    private function renderizar(iterable $alunos)
     {
-        date_default_timezone_set('America/Sao_Paulo');
-        $hoje = date('d/m/Y, H:i:s');
-        $alunos = $this->repository->buscarTodos();
-        $corpoTabela = '';
-        $estaMatriculado = 'Não matriculado';
-        
-        foreach($alunos as $cadaAluno){
-            $inverterData = array_reverse(explode('-',$cadaAluno->dataNascimento));
-            $dataNascimento = implode('/',$inverterData);
-            if($cadaAluno->status == 1){
-                $estaMatriculado = 'Matriculado';
-            }
-            $corpoTabela .= "
-                <tr>
-                    <td>{$cadaAluno->id}</td>
-                    <td>{$cadaAluno->nome}</td>
-                    <td>{$cadaAluno->cpf}</td>
-                    <td>{$cadaAluno->matricula}</td>
-                    <td>{$cadaAluno->email}</td>
-                    <td>{$estaMatriculado}</td>
-                    <td>{$cadaAluno->genero}</td>
-                    <td>{$dataNascimento}</td>
-                </tr>
+        $resultado = '';
+        foreach ($alunos as $aluno) {
+        $resultado .= "
+            <tr>
+                <td>{$aluno->id}</td>
+                <td>{$aluno->nome}</td>
+                <td>{$aluno->matricula}</td>
+                <td>{$aluno->cpf}</td>
+                <td>{$aluno->email}</td>
+                <td>{$aluno->genero}</td>
+                <td>{$aluno->status}</td>
+                <td>{$aluno->dataNascimento}</td>
+            </tr>
             ";
+            }
+            return $resultado;
         }
-        $design = "
+    public function relatorio(): void
+    {
+        $hoje = date('d/m/Y');
+        $alunos = $this->repository->buscarTodos();
+        $design =  "
             <h1>Relatorio de Alunos</h1>
-            <em>Gerado em {$hoje}</em>
             <hr>
-            <table border='1' width='100%' style='margin-top: 30px; text-align:center;'>
+            <em>Gerado em {$hoje}</em>
+            <br>
+            <table border='1' width='100%' style='margin-top: 30px;'>
                 <thead>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>CPF</th>
-                    <th>Matricula</th>
-                    <th>E-mail</th>
-                    <th>Status</th>
-                    <th>Gênero</th>
-                    <th>Data de nascimento</th>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Matricula</th>
+                        <th>CPF</th>
+                        <th>Email</th>
+                        <th>Gênero</th>
+                        <th>Status</th>
+                        <th>Data Nascimento</th>
+                    </tr>
                 </thead>
-                <tbody>" 
-                .
-                $corpoTabela 
-                .
-                "</tbody>
-            </table>"; 
-
+                <tbody>
+                ".$this->renderizar($alunos)."
+                </tbody>
+            </table>
+        ";
         $dompdf = new Dompdf();
-
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->loadHtml($design);
-        $dompdf->render();
-        $dompdf->stream('relatorio-de-alunos.pdf', ['Attachment' => 0]);
+        $dompdf->setPaper('A4', 'portrait'); // tamanho da pagina
+        $dompdf->loadHtml($design); //carrega o conteudo do PDF
+        $dompdf->render(); //aqui renderiza 
+        $dompdf->stream('relatorio-aluno.pdf',['Attachment' => 0,]); //é aqui que a magica acontece
     }
 }

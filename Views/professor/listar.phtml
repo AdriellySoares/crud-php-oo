@@ -1,45 +1,71 @@
-<section class="card card-body container-fluid ">
-    <h1 class="text-center">Listar professores:</h1>
-    <hr>
-    <div class="mt-2 w-100 d-flex justify-content-end">
-        <a href="alunos/novo"class="btn btn-outline-primary ">Adicionar professor</a>
+<section class="mt-3 card card-body">
+    <h1>Gerenciar Professores</h1>
+    <div class="mt-2">
+        <a href="/professores/novo" class="btn btn-outline-dark">Novo Professor</a>
+        <a href="/professores/relatorio" target="_blank" class="btn btn-outline-dark">Gerar PDF</a>
     </div>
-    
-    <table class="table table-striped table-hover table-bordered align-middle text-center mt-4">
-        <caption>Tabela de professores</caption>
+    <table class="table table-striped table-hover mt-4">
         <thead class="table-dark">
             <tr>
                 <th>#ID</th>
                 <th>Nome</th>
                 <th>CPF</th>
                 <th>Endereço</th>
-                <th>Formação</th>
                 <th>Status</th>
-                <th>Horarios Disponiveis</th>
+                <th>Formação</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
             <?php
-                foreach($professores ?? [] as $cadaProfessor)
-                {
-                    echo "
+            if(isset($professores)&& sizeof($professores) > 0){
+                foreach($professores as $professor){
+                    echo"
                         <tr>
-                            <td class='fw-bold'>{$cadaProfessor->id}</td>
-                            <td>{$cadaProfessor->nome}</td>
-                            <td>{$cadaProfessor->cpf}</td>
-                            <td>{$cadaProfessor->endereco}</td>
-                            <td>{$cadaProfessor->formacao}</td>
-                            <td>{$cadaProfessor->status}</td>
-                            <td>{$cadaProfessor->horariosDisponiveis}</td>
+                            <td>{$professor->id}</td>
+                            <td>{$professor->nome}</td>
+                            <td>{$professor->cpf}</td>
+                            <td>{$professor->endereco}</td>
+                            <td>{$professor->status}</td>
+                            <td>{$professor->formacao}</td>
                             <td>
-                                <a class='btn btn-warning me-1'>Editar</button>
-                                <a href='excluir?id={$cadaProfessor->id}' class='btn btn-danger'>Excluir</button>
+                                <a href='/professores/editar?id={$professor->id}' class='btn btn-outline-warning'>Editar</a>
+                                <button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#modalexcluir' onclick='pegarID({$professor->id})'>Excluir</button>
                             </td>
                         </tr>
-                        ";
-                    } 
+                    ";
+            }
+            }
             ?>
         </tbody>
     </table>
 </section>
+<div class='modal fade' id='modalexcluir' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title fs-5' id='exampleModalLabel'>Apagar Professor</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                DESEJA APAGAR ESTE PROFESSOR?
+                <input type="hidden" id="idatual">
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Cancelar</button>
+                <button type='button' onclick='confirmar()' class='btn btn-danger'>Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function pegarID(id){
+        document.getElementById("idatual").value = id;
+    }
+    function confirmar(){
+        if(true === confirm('Tem certeza mesmo?')){
+            id= idatual.value;
+            location.href = '/professores/excluir?id='+id;
+        }
+    }
+</script>

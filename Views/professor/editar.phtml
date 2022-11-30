@@ -1,0 +1,18 @@
+<section class="mt-3 card card-body">
+    <h1>Editar Professor</h1>
+    <div class="row">
+        <div class="col">
+            <form action="#" method="POST">
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" id="nome" class="form-control mb-3" value="<?php echo $dados[0]->nome; ?>">
+                <label for="endereco">Endereço</label>
+                <input type="text" name="endereco" id="endereco" class="form-control mb-3" value="<?php echo $dados[0]->endereco; ?>">
+                <label for="cpf">CPF</label>
+                <input type="text" name="cpf" id="cpf" class="form-control mb-3" value="<?php echo $dados[0]->cpf; ?>">
+                <label for="formacao">Formação</label>
+                <input type="text" name="formacao" id="formacao" class="form-control mb-3" value="<?php echo $dados[0]->formacao; ?>">
+                <button type="submit" class="btn btn-primary">Pronto</button>
+            </form>
+        </div>
+    </div>
+</section>

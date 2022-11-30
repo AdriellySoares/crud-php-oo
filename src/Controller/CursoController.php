@@ -1,12 +1,11 @@
 <?php
-
-declare(strict_types = 1);
-
+declare(strict_types=1);
 namespace App\Controller;
 
 use App\Model\Curso;
-use App\Repository\CategoriaRepository;
 use App\Repository\CursoRepository;
+use App\Repository\CategoriaRepository;
+use App\Security\UsuarioSecurity;
 use Dompdf\Dompdf;
 use Exception;
 
@@ -15,131 +14,109 @@ class CursoController extends AbstractController
     private CursoRepository $repository;
     public function __construct()
     {
-        $this->repository = new CursoRepository;
+        $this->repository = new CursoRepository();
     }
-
-    public function listar() : void
+    public function listar(): void
     {
-        $this->renderizar('curso/listar', [
-            'cursos' => $this->repository->buscarTodos()
-        ]);
+        // $this->checarLogin();
+        $cursos = $this->repository->buscarTodos();
+        $this->render('curso/listar',['cursos'=>$cursos,]);
     }
-
-    public function novo() : void
+    public function cadastrar(): void
     {
-        if(empty($_POST)){
-            $this->categoriaRepository = new CategoriaRepository;
-            $this->renderizar('curso/novo', [
-                'categorias' => $this->categoriaRepository->buscarTodos()
-        ]);
+        $categoriaRep = new CategoriaRepository();
+        $categoria = $categoriaRep->buscarTodos();
+        if(true === empty($_POST)){
+            $this->render('curso/cadastrar', ['categorias' => $categoria]);
             return;
         }
-        
         $curso = new Curso();
         $curso->nome = $_POST['nome'];
-        $curso->cargaHoraria = $_POST['cargaHoraria'];
         $curso->descricao = $_POST['descricao'];
+        $curso->cargaHoraria = intval($_POST['cargaHoraria']);
         $curso->categoria_id = intval($_POST['categoria']);
-        
         try{
             $this->repository->inserir($curso);
         } catch(Exception $exception){
-            if(str_contains($exception->getMessage(), 'nome')){
-                die('O curso já existe');
+            if(true === str_contains($exception->getMessage(), 'nome')){
+                die('Curso já existe');
             }
-
-            die('Vish, aconteceu um erro');
         }
-        $this->redirecionar('cursos/listar');      
+        $this->redirect('/cursos/listar');
     }
-
-    public function editar() : void
+    public function editar(): void
     {
         $id = $_GET['id'];
+        $rep = new CategoriaRepository();
+        $categorias = $rep->buscarTodos();
         $curso = $this->repository->buscarUm($id);
-        $this->categoriaRepository = new CategoriaRepository;
-        $this->renderizar('curso/editar', [
-            $curso,
-            'categorias' => $this->categoriaRepository->buscarTodos()
-        ]); 
-        if(!empty($_POST)){
+        $this->render("/curso/editar", [
+            'categorias' => $categorias,
+            'curso' => $curso
+        ]);
+        if (false === empty($_POST)) {
+            $curso = new Curso();
             $curso->nome = $_POST['nome'];
-            $curso->cargaHoraria = $_POST['cargaHoraria'];
             $curso->descricao = $_POST['descricao'];
+            $curso->cargaHoraria = intval($_POST['cargaHoraria']);
             $curso->categoria_id = intval($_POST['categoria']);
-            try{
-                $this->repository->atualizar($curso, $id);
-            } catch(Exception $exception){
-                if(str_contains($exception->getMessage(), 'nome')){
-                    die('O curso já existe');
-                }
-
-                die('Vish, aconteceu um erro');
-            }
-            $this->redirecionar('cursos/listar');
+            $this->repository->atualizar($curso, $id);
+            $this->redirect('/cursos/listar');
         }
     }
-
-    public function excluir() : void
+    public function excluir(): void
     {
         $id = $_GET['id'];
         $this->repository->excluir($id);
-        
-        $this->redirecionar('cursos/listar');
+        $this->render('curso/excluir');
+        $this->redirect('/cursos/listar');
     }
-
+    private function renderizar(iterable $cursos)
+    {
+        $resultado = '';
+        foreach ($cursos as $curso){
+            $resultado .= "
+            <tr>
+            <td>{$curso['curso_id']}</td>
+            <td>{$curso['curso_nome']}</td>
+            <td>{$curso['curso_status']}</td>
+            <td>{$curso['curso_descricao']}</td>
+            <td>{$curso['curso_carga_horaria']}</td>
+            <td>{$curso['categoria_nome']}</td>
+            </tr>
+            ";
+        }
+        return $resultado;
+    }
     public function relatorio(): void
     {
-        date_default_timezone_set('America/Sao_Paulo');
-        $hoje = date('d/m/Y H:i:s');
+        $hoje = date('d/m/Y');
         $cursos = $this->repository->buscarTodos();
-        $this->categoriaRepository = new CategoriaRepository;
-        $categorias = $this->categoriaRepository->buscarTodos();
-        $corpotabela = '';
-        foreach($cursos as $cadaCurso){
-            foreach($categorias as $cadaCategoria){
-                if($cadaCurso[5] == $cadaCategoria->id){
-                    $colunaCategoria = $cadaCategoria->nome;
-                }
-            }
-            $corpotabela .= "
-            <tr>
-                <td>{$cadaCurso[0]}</td>
-                <td>{$cadaCurso[1]}</td>
-                <td>{$cadaCurso[2]}</td>
-                <td>{$cadaCurso[3]}</td>
-                <td>{$cadaCurso[4]}</td>
-                <td>{$colunaCategoria}</td>
-            </tr> ";
-        } 
-
         $design =  "
             <h1>Relatorio de Alunos</h1>
-            <em>Gerado em {$hoje}</em>
             <hr>
+            <em>Gerado em {$hoje}</em>
             <br>
-            <table border='1' width='100%' style='margin-top: 30px; text-align:center;'>
+            <table border='1' width='100%' style='margin-top: 30px;'>
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Nome</th>
-                        <th>Carga Horaria</th>
-                        <th>Descrição</th>
                         <th>Status</th>
+                        <th>Descrição</th>
+                        <th>Carga Horaria</th>
                         <th>Categoria</th>
                     </tr>
                 </thead>
-                <tbody>" 
-                . 
-                    $corpotabela 
-                . 
-                "</tbody>
+                <tbody>
+                ".$this->renderizar($cursos)."
+                </tbody>
             </table>
         ";
         $dompdf = new Dompdf();
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->loadHtml($design);
         $dompdf->render();
-        $dompdf->stream('relatorio-de-cursos.pdf', ['Attachment' => 0]);
+        $dompdf->stream('relatorio-cursos.pdf', ['Attachment' => 0,]);
     }
 }

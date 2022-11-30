@@ -1,23 +1,16 @@
 <?php
+use App\Connection\DatabaseConnection; // solicitando ao composer que gerencie o carragamento automatico dos arquivos
 
-use App\Connection\DatabaseConnection;
-
-include dirname(__DIR__) . '../vendor/autoload.php';
-include dirname(__DIR__) . '../config/database.php';
-
+include_once '../vendor/autoload.php';
 session_start();
-
-$rotas = require dirname(__DIR__) . '../config/rotas.php';
-
-$url = $_SERVER["REQUEST_URI"];
-$rota = explode("?", $url)[0];
-
-if(!isset($rotas[$rota])){
-    echo 'Erro 404';
+include '../config/database.php';
+$rotas = require '../config/routes.php';
+$url = $_SERVER['REQUEST_URI']; //pegando a url acessada pelo usuario
+$rota = explode('?', $url)[0]; //separando a url, atraves do "?"
+if(false === isset($rotas[$rota])){
+    echo "Erro 404";
     exit;
 }
-
 $controller = $rotas[$rota]['controller'];
 $method = $rotas[$rota]['method'];
-
 (new $controller)->$method();
